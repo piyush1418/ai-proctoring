@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureProctor | Official Exam Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --fp-dark-green: #1a3c34;
+            --fp-accent-orange: #ff9f1c;
+            --fp-soft-bg: #f4f7f6;
+            --fp-white: #ffffff;
+            --fp-success: #10b981;
+            --fp-danger: #ef4444;
+        }
+
+        body {
+            background-color: var(--fp-soft-bg);
+            font-family: 'Inter', sans-serif;
+            color: #333;
+        }
+
+        .result-header {
+            background-color: var(--fp-dark-green);
+            color: var(--fp-white);
+            padding: 40px 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .brand-text {
+            color: var(--fp-accent-orange);
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .score-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border-bottom: 4px solid var(--fp-dark-green);
+            transition: transform 0.3s ease;
+        }
+
+        .score-card:hover { transform: translateY(-5px); }
+
+        .score-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--fp-dark-green);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--fp-dark-green);
+            margin: 40px 0 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 2px;
+            background: #e2e8f0;
+            margin-left: 15px;
+        }
+
+        /* Status Badges */
+        .pass-badge { background: var(--fp-success); color: white; padding: 8px 25px; border-radius: 50px; font-weight: 700; }
+        .fail-badge { background: var(--fp-danger); color: white; padding: 8px 25px; border-radius: 50px; font-weight: 700; }
+        
+        .ans-status-correct { color: var(--fp-success); background: #f0fdf4; border: 1px solid #bbf7d0; padding: 2px 10px; border-radius: 5px; font-weight: 600; font-size: 0.75rem; }
+        .ans-status-wrong { color: var(--fp-danger); background: #fef2f2; border: 1px solid #fecaca; padding: 2px 10px; border-radius: 5px; font-weight: 600; font-size: 0.75rem; }
+
+        .severity-bar-container {
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .severity-fill {
+            height: 100%;
+            transition: width 1.5s cubic-bezier(0.1, 0, 0.3, 1);
+        }
+
+        .ai-recommendation {
+            border-radius: 20px;
+            padding: 30px;
+            background: white;
+            border: 2px solid #e2e8f0;
+        }
+        .ai-recommendation.pass { border-color: var(--fp-success); background: #f0fdf4; }
+        .ai-recommendation.fail { border-color: var(--fp-danger); background: #fef2f2; }
+
+        .solution-card {
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            padding: 20px;
+            border-left: 5px solid #e2e8f0;
+        }
+        .solution-card.correct { border-left-color: var(--fp-success); }
+        .solution-card.incorrect { border-left-color: var(--fp-danger); }
+
+        .btn-fp-orange {
+            background: var(--fp-accent-orange);
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 12px 35px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-fp-orange:hover { background: #e68a00; transform: scale(1.05); color: white; }
+
+        .stat-icon { font-size: 1.5rem; margin-bottom: 8px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="container my-5">
+        <div class="result-header">
+            <span class="brand-text">Integrity Verified Assessment</span>
+            <h1 class="fw-bold">Exam Performance Report</h1>
+            <p class="opacity-75 mb-0">Candidate: <strong>{{ user.first_name }}</strong></p>
+        </div>
+
+        <div class="row g-4 mb-4 text-center">
+            <div class="col-md-4">
+                <div class="score-card">
+                    <span class="text-muted small fw-bold text-uppercase">Raw Score</span>
+                    <div class="score-val">{{ score }}<span class="fs-4 text-muted">/{{ total_questions }}</span></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="score-card">
+                    <span class="text-muted small fw-bold text-uppercase">Accuracy</span>
+                    <div class="score-val text-success">{{ percentage }}%</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="score-card">
+                    <span class="text-muted small fw-bold text-uppercase">Integrity Rating</span>
+                    <div class="score-val text-primary">{{ 100|add:"-"|add:cheating_severity }}%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm p-4" style="border-radius: 20px;">
+            
+            <h5 class="section-title">Integrity Incident Summary</h5>
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-md-3">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fas fa-exclamation-triangle stat-icon text-warning"></i>
+                        <div class="small text-muted fw-bold">TOTAL INCIDENTS</div>
+                        <div class="h4 mb-0 fw-bold">{{ cheating_events|length }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fas fa-external-link-alt stat-icon text-primary"></i>
+                        <div class="small text-muted fw-bold">TAB SWITCHES</div>
+                        <div class="h4 mb-0 fw-bold">{{ tab_switch_count|default:"0" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fas fa-mobile-alt stat-icon text-danger"></i>
+                        <div class="small text-muted fw-bold">PHONE DETECTED</div>
+                        <div class="h4 mb-0 fw-bold">{{ phone_detection_count|default:"0" }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 border rounded-4 bg-white shadow-sm">
+                        <i class="fas fa-users stat-icon text-info"></i>
+                        <div class="small text-muted fw-bold">MULTI-PERSON</div>
+                        <div class="h4 mb-0 fw-bold">{{ multiple_person_count|default:"0" }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="section-title">Performance Analytics</h5>
+            <div class="row g-4 text-center mb-5">
+                <div class="col-lg-6">
+                    <div class="bg-white rounded-4 p-4 shadow-sm">
+                        <h6 class="text-muted mb-4 small fw-bold">SCORE PERFORMANCE</h6>
+                        <canvas id="scoreChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bg-white rounded-4 p-4 shadow-sm">
+                        <h6 class="text-muted mb-4 small fw-bold">INTEGRITY ANALYSIS</h6>
+                        <canvas id="integrityChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-lg-6">
+                    <div class="bg-white rounded-4 p-4 shadow-sm">
+                        <h6 class="text-muted mb-4 small fw-bold">CHEATING INCIDENTS BREAKDOWN</h6>
+                        <canvas id="incidentsChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bg-white rounded-4 p-4 shadow-sm">
+                        <h6 class="text-muted mb-4 small fw-bold">OVERALL ASSESSMENT</h6>
+                        <div class="text-center">
+                            <canvas id="gaugeChart" style="max-height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="section-title">Detailed Integrity Log</h5>
+            {% if cheating_events %}
+                <div class="p-4 border rounded-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold small text-muted">SEVERITY INDEX</span>
+                        <span class="fw-bold text-danger">{{ cheating_severity }}%</span>
+                    </div>
+                    <div class="severity-bar-container">
+                        <div class="severity-fill" style="width: {{ cheating_severity }}%; background: {% if cheating_severity > 60 %}#ef4444{% elif cheating_severity > 30 %}#f59e0b{% else %}#10b981{% endif %};"></div>
+                    </div>
+                    
+                    {% for event in cheating_events %}
+                    <div class="alert alert-light border shadow-sm rounded-4 mt-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge {% if 'object' in event.type %}bg-danger{% elif 'audio' in event.type %}bg-warning{% elif 'multiple' in event.type %}bg-info{% else %}bg-secondary{% endif %} text-dark">
+                                <i class="fas {% if 'object' in event.type %}fa-phone-slash{% elif 'audio' in event.type %}fa-microphone{% elif 'multiple' in event.type %}fa-users{% else %}fa-eye{% endif %} me-1"></i> {{ event.type|upper }}
+                            </span>
+                            <small class="text-muted">{{ event.timestamp }}</small>
+                        </div>
+                        <p class="mt-2 mb-0 small text-muted"><strong>Analysis:</strong> {{ event.details }}</p>
+                        <div class="mt-2 pt-2 border-top">
+                            <small class="text-muted">Severity: <strong>{{ event.severity }}/100</strong></small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-success border-0 rounded-4 d-flex align-items-center p-4">
+                    <span class="fs-4 me-3">🛡️</span>
+                    <div><strong>Verified Integrity:</strong> No suspicious behavioral patterns detected. AI verification successful.</div>
+                </div>
+            {% endif %}
+
+            <h5 class="section-title">Performance Breakdown by Question</h5>
+            <div class="mt-3">
+                {% for category, stats in performance_by_category.items %}
+                <div class="card border-0 shadow-sm mb-3 rounded-4">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold">{{ category }}</h6>
+                            <span class="badge bg-primary">{{ stats.total }} Questions</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center p-5 text-muted">
+                    <i class="fas fa-info-circle mb-2 fs-3"></i>
+                    <p>Performance breakdown data not available.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h5 class="section-title">Question-by-Question Solutions</h5>
+            {% if student_answers %}
+                <div class="mt-3">
+                    {% for question_id, answer_data in student_answers.items %}
+                    <div class="card border-0 shadow-sm mb-3 rounded-4 {% if answer_data.is_correct %}border-success{% else %}border-danger{% endif %}" style="border-left: 5px solid {% if answer_data.is_correct %}#10b981{% else %}#ef4444{% endif %} !important;">
+                        <div class="card-body p-4">
+                            <!-- Question Text -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="fw-bold text-dark mb-1">Q{{ forloop.counter }}. {{ answer_data.question_text }}</h6>
+                                    <small class="text-muted">{{ answer_data.question_type|title }}</small>
+                                </div>
+                                <span class="badge {% if answer_data.is_correct %}bg-success{% else %}bg-danger{% endif %} text-white ms-3">
+                                    {% if answer_data.is_correct %}
+                                        <i class="fas fa-check me-1"></i> CORRECT
+                                    {% else %}
+                                        <i class="fas fa-times me-1"></i> INCORRECT
+                                    {% endif %}
+                                </span>
+                            </div>
+
+                            <!-- Answer Comparison -->
+                            <div class="row mt-4">
+                                <div class="col-lg-6 mb-3 mb-lg-0">
+                                    <div class="p-3 bg-light rounded-3 border-start border-primary" style="border-width: 3px;">
+                                        <small class="text-muted fw-bold d-block mb-2">
+                                            <i class="fas fa-user-circle me-1"></i> YOUR ANSWER
+                                        </small>
+                                        <div class="{% if answer_data.is_correct %}text-success fw-bold{% else %}text-danger fw-bold{% endif %}" style="font-size: 1.1rem;">
+                                            {{ answer_data.student_answer|default:"No Answer Submitted" }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="p-3 bg-light rounded-3 border-start border-success" style="border-width: 3px;">
+                                        <small class="text-muted fw-bold d-block mb-2">
+                                            <i class="fas fa-check-circle me-1"></i> CORRECT ANSWER
+                                        </small>
+                                        <div class="text-success fw-bold" style="font-size: 1.1rem;">
+                                            {{ answer_data.correct_answer }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info border-0 rounded-4 d-flex align-items-center p-4">
+                    <span class="fs-4 me-3">ℹ️</span>
+                    <div><strong>No Answer Data Available:</strong> Questions and answers data not found for this exam session.</div>
+                </div>
+            {% endif %}
+
+            <h5 class="section-title">Final Credential Assessment</h5>
+            <div class="ai-recommendation {% if pass_fail_decision == 'PASS' %}pass{% else %}fail{% endif %}">
+                <div class="text-center mb-4">
+                    <span class="{% if pass_fail_decision == 'PASS' %}pass-badge{% else %}fail-badge{% endif %}">
+                        {{ pass_fail_decision }}
+                    </span>
+                </div>
+                <p class="fw-bold mb-1">AI Evaluator Summary:</p>
+                <p class="text-muted small mb-0">{{ decision_reason }}</p>
+                <div class="mt-3 pt-3 border-top">
+                    <small class="text-muted"><strong>Exam Date:</strong> {{ exam_date }}</small>
+                </div>
+            </div>
+
+            <div class="text-center mt-5 d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/dashboard/" class="btn btn-fp-orange shadow" style="padding: 12px 35px; border-radius: 12px; font-weight: 700;">
+                    <i class="fas fa-chart-line me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary shadow" style="padding: 12px 35px; border-radius: 12px; font-weight: 700; border-width: 2px;">
+                    <i class="fas fa-home me-2"></i> Home Page
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Analytics data from backend
+        const analyticsData = {{ analytics_json|safe }};
+        const cheatingData = {{ cheating_categories|safe }};
+
+        // Score Performance Chart - Doughnut
+        const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(scoreCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Correct Answers', 'Incorrect Answers'],
+                datasets: [{
+                    data: [analyticsData.correct, analyticsData.incorrect],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            },
+            options: { 
+                cutout: '70%', 
+                responsive: true,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { padding: 20, font: { family: 'Inter', weight: 'bold', size: 12 } } },
+                    tooltip: { callbacks: { label: function(context) { return context.label + ': ' + context.parsed + ' questions'; } } }
+                } 
+            }
+        });
+
+        // Integrity Gauge Chart
+        const integrityCtx = document.getElementById('integrityChart').getContext('2d');
+        const integrityScore = 100 - {{ cheating_severity }};
+        new Chart(integrityCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Integrity Score', 'Cheating Risk'],
+                datasets: [{
+                    data: [integrityScore, {{ cheating_severity }}],
+                    backgroundColor: [
+                        integrityScore >= 70 ? '#10b981' : (integrityScore >= 50 ? '#f59e0b' : '#ef4444'),
+                        '#e2e8f0'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: { 
+                cutout: '60%', 
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { padding: 20, font: { family: 'Inter' } } } } 
+            }
+        });
+
+        // Cheating Incidents Breakdown - Bar Chart
+        const incidentsCtx = document.getElementById('incidentsChart').getContext('2d');
+        new Chart(incidentsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Tab Switches', 'Objects', 'Audio', 'Gaze', 'Multiple Persons'],
+                datasets: [{
+                    label: 'Incidents Count',
+                    data: [
+                        cheatingData.tab_switches || 0,
+                        cheatingData.objects_detected || 0,
+                        cheatingData.audio_detected || 0,
+                        cheatingData.gaze_issues || 0,
+                        cheatingData.multiple_persons || 0
+                    ],
+                    backgroundColor: ['#3b82f6', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899'],
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: { 
+                responsive: true,
+                indexAxis: 'y',
+                scales: { 
+                    x: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { stepSize: 1 } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Overall Assessment Gauge
+        const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+        const overallScore = ({{ percentage }} * 0.7) + (integrityScore * 0.3);
+        new Chart(gaugeCtx, {
+            type: 'gauge',
+            data: {
+                datasets: [{
+                    data: [overallScore],
+                    value: overallScore,
+                    backgroundColor: overallScore >= 70 ? '#10b981' : (overallScore >= 50 ? '#f59e0b' : '#ef4444'),
+                    borderColor: '#ffffff',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                circumference: 180,
+                rotation: 270,
+                plugins: {
+                    datalabels: {
+                        color: '#000',
+                        font: { size: 20, weight: 'bold' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

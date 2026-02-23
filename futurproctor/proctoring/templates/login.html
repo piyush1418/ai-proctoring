@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureProctor | Student Authentication</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --brand-green: #1a3c34;
+            --accent-gold: #ff9f1c;
+            --soft-bg: #fcfcf9;
+            --input-bg: #f8fafc;
+            --text-muted: #6b7280;
+        }
+
+        body {
+            background-color: var(--soft-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: none; /* Matches your sparkle cursor requirement */
+        }
+
+        .login-card {
+            background: white;
+            width: 100%;
+            max-width: 1100px;
+            border-radius: 20px 20px 100px 20px; 
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 40px 80px rgba(26, 60, 52, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .login-card::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            border-top: 3px solid #000;
+            border-right: 3px solid #000;
+            border-radius: 0 8px 0 0;
+            z-index: 10;
+        }
+
+        .login-header { padding: 40px 50px 20px; }
+        .login-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--brand-green); font-weight: 700; }
+        .login-body { padding: 0 50px 50px; }
+
+        .premium-alert {
+            background: #f0f7f4;
+            border-left: 5px solid var(--brand-green);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: var(--brand-green);
+        }
+
+        .form-label-premium { font-weight: 700; font-size: 0.8rem; color: var(--brand-green); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+        .form-control-premium { background-color: var(--input-bg); border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; width: 100%; margin-bottom: 20px; transition: 0.3s; }
+        .form-control-premium:focus { border-color: var(--brand-green); box-shadow: 0 0 0 4px rgba(26, 60, 52, 0.05); outline: none; }
+
+        .webcam-container { border: 5px solid #eef2f1; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #webcam-stream { width: 100%; background: #000; }
+        
+        .btn-capture { background: var(--brand-green); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; width: 100%; margin-top: 15px; transition: 0.3s; }
+        .btn-login-main { background: var(--accent-gold); color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 800; width: 100%; margin-top: 30px; transition: 0.3s; }
+        .btn-login-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 159, 28, 0.3); }
+
+        .sparkle { position: fixed; pointer-events: none; z-index: 9999; animation: sparkleAnimation 0.6s ease-out forwards; }
+        @keyframes sparkleAnimation { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="login-header">
+            <h1 class="login-title">Student Login</h1>
+            <p class="text-muted small">Access your secure examination portal.</p>
+        </div>
+
+        <div class="login-body">
+            <div class="premium-alert">
+                <h6><i class="fas fa-info-circle me-2"></i>Security Protocol</h6>
+                <ul>
+                    <li>Align your face within the camera frame for biometric verification.</li>
+                    <li>Ensure your environment is well-lit and quiet.</li>
+                </ul>
+            </div>
+
+            <div class="row g-5">
+                <div class="col-lg-6">
+                    <h5 class="fw-bold mb-4" style="color: var(--brand-green);">Verification Details</h5>
+                    <form id="login-form">
+                        {% csrf_token %}
+                        <div id="error-message" class="alert alert-danger d-none mb-4" style="border-radius: 12px; font-size: 0.85rem;"></div>
+                        
+                        <label class="form-label-premium">Institutional Email</label>
+                        <input type="email" id="username" name="email" class="form-control-premium" placeholder="student@university.edu" required>
+                        
+                        <label class="form-label-premium">Password</label>
+                        <input type="password" id="password" name="password" class="form-control-premium" placeholder="••••••••" required>
+                        
+                        <input type="hidden" id="captured_photo_input" name="captured_photo">
+
+                        <button type="button" id="login-btn" class="btn-login-main">
+                            <i class="fas fa-sign-in-alt me-2"></i>Authenticate & Start Exam
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="small text-muted">Don't have an account? <a href="{% url 'registration' %}" style="color: var(--brand-green); font-weight: 700; text-decoration: none;">Register with your Institute</a></p>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 text-center">
+                    <h5 class="fw-bold mb-4" style="color: var(--brand-green);">Biometric Capture</h5>
+                    <div class="webcam-container">
+                        <video id="webcam-stream" autoplay playsinline></video>
+                        <canvas id="canvas" class="d-none"></canvas>
+                    </div>
+
+                    <button type="button" id="take-photo-btn" class="btn-capture">
+                        <i class="fas fa-camera me-2"></i>Capture Photo
+                    </button>
+
+                    <div id="photo-preview-box" class="mt-4 p-3 d-none" style="background: white; border: 2px dashed var(--brand-green); border-radius: 12px;">
+                        <p class="small fw-bold mb-2 text-success"><i class="fas fa-check-circle me-1"></i> Biometric Sample Ready</p>
+                        <img id="captured-photo" style="width: 100%; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sparkle Effect
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.8) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = e.clientX + 'px';
+                sparkle.style.top = e.clientY + 'px';
+                sparkle.style.width = '4px';
+                sparkle.style.height = '4px';
+                sparkle.style.background = '#ff9f1c';
+                sparkle.style.borderRadius = '50%';
+                sparkle.style.setProperty('--tx', (Math.random()-0.5)*100 + 'px');
+                sparkle.style.setProperty('--ty', (Math.random()-0.5)*100 + 'px');
+                document.body.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 600);
+            }
+        });
+
+        const videoElement = document.getElementById('webcam-stream');
+        const takePhotoBtn = document.getElementById('take-photo-btn');
+        const canvas = document.getElementById('canvas');
+        const capturedPhoto = document.getElementById('captured-photo');
+        const capturedPhotoInput = document.getElementById('captured_photo_input');
+        const errorMessage = document.getElementById('error-message');
+        const loginBtn = document.getElementById('login-btn');
+
+        let photoCaptured = false;
+
+        // Camera Logic
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (err) {
+                errorMessage.innerHTML = "Camera access denied.";
+                errorMessage.classList.remove('d-none');
+            }
+        }
+
+        takePhotoBtn.addEventListener('click', () => {
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            canvas.getContext('2d').drawImage(videoElement, 0, 0);
+            const data = canvas.toDataURL('image/jpeg');
+            capturedPhoto.src = data;
+            capturedPhotoInput.value = data;
+            photoCaptured = true;
+            document.getElementById('photo-preview-box').classList.remove('d-none');
+        });
+
+        // Connection Logic (Matches your original fetch implementation)
+        loginBtn.addEventListener('click', () => {
+            if (!photoCaptured) {
+                errorMessage.innerHTML = "Please capture biometrics first.";
+                errorMessage.classList.remove('d-none');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('email', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('captured_photo', capturedPhotoInput.value);
+
+            fetch('/login/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    errorMessage.innerHTML = data.error;
+                    errorMessage.classList.remove('d-none');
+                }
+            })
+            .catch(() => {
+                errorMessage.innerHTML = "Authentication failed.";
+                errorMessage.classList.remove('d-none');
+            });
+        });
+
+        window.onload = initCamera;
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: futurproctor
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn futurproctor.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False

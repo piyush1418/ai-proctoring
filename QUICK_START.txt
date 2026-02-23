@@ -1,0 +1,42 @@
+# 🚀 QUICK DEPLOYMENT - JUST FOLLOW THESE STEPS
+
+## You have 2 options:
+
+### ✅ OPTION A: Deploy in 5 Minutes (Recommended)
+
+**STEP 1:** Copy everything from here to GitHub
+```
+Source: c:\Users\piyus\Downloads\AI-Based-online-exam-proctoring-System-main\AI-Based-online-exam-proctoring-System-main\futurproctor\
+```
+
+**STEP 2:** Create GitHub account → New Repository → Upload files above
+
+**STEP 3:** Go to render.com → Create Web Service → Connect GitHub Repo
+
+**STEP 4:** Set environment variables (see DEPLOYMENT_STEPS.md)
+
+**STEP 5:** Click Deploy - DONE! You'll get a live URL in 10 minutes
+
+---
+
+### ✅ OPTION B: Deploy with Heroku (Alternative)
+
+Better for beginners - visit https://heroku.com
+
+---
+
+## Files Ready to Upload to GitHub:
+
+All in: `c:\Users\piyus\Downloads\AI-Based-online-exam-proctoring-System-main\AI-Based-online-exam-proctoring-System-main\futurproctor\`
+
+- ✅ manage.py
+- ✅ futurproctor/
+- ✅ proctoring/
+- ✅ requirements.txt
+- ✅ runtime.txt
+- ✅ Procfile
+- ✅ build.sh
+- ✅ render.yaml
+
+**Your app will be live at:** https://exam-proctoring.onrender.com
+
