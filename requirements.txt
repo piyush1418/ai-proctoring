@@ -32,8 +32,8 @@ hyperframe==6.1.0
 hyperlink==21.0.0
 idna==3.10
 incremental==24.7.2
-jax==0.4.38
-jaxlib==0.4.38
+jax==0.4.30
+jaxlib>=0.4.30
 Jinja2==3.1.5
 kiwisolver==1.4.8
 lxml==5.3.0
