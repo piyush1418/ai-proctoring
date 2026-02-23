@@ -1,0 +1,12 @@
+Django==5.1.5
+opencv-python-headless==4.10.0.84
+mediapipe==0.10.14
+ultralytics==8.3.41
+Pillow==10.4.0
+numpy==1.26.4
+torch==2.5.1
+torchvision==0.20.1
+gunicorn==23.0.0
+whitenoise==6.8.2
+psycopg2-binary==2.9.10
+dj-database-url==2.2.0

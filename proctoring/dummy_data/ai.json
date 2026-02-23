@@ -1,0 +1,105 @@
+{
+    "subject": "AI/ML",
+    "questions": [
+        {
+            "id": 1,
+            "type": "objective",
+            "text": "What is the purpose of a loss function in machine learning?",
+            "option_a": "To measure the model's error",
+            "option_b": "To optimize the model",
+            "option_c": "To initialize the model weights",
+            "option_d": "To split the dataset",
+            "correct_answer": "A"
+        },
+        {
+            "id": 2,
+            "type": "subjective",
+            "text": "Explain the concept of overfitting in machine learning. How can you prevent it?",
+            "correct_answer": "Overfitting occurs when a model learns the training data too well, including its noise. Prevention: regularization, cross-validation, early stopping."
+        },
+        {
+            "id": 3,
+            "type": "coding",
+            "text": "Write a Python function to implement linear search:",
+            "code_template": "def linear_search(arr, target):\n    # Your code here\n    pass",
+            "correct_answer": "def linear_search(arr, target):\n    for i in range(len(arr)):\n        if arr[i] == target:\n            return i\n    return -1"
+        },
+        {
+            "id": 4,
+            "type": "objective",
+            "text": "What does 'supervised learning' mean?",
+            "option_a": "Training a model with labeled data",
+            "option_b": "Training a model without labels",
+            "option_c": "Using reinforcement signals",
+            "option_d": "Learning from rewards",
+            "correct_answer": "A"
+        },
+        {
+            "id": 5,
+            "type": "subjective",
+            "text": "What is backpropagation and how does it work in neural networks?",
+            "correct_answer": "Backpropagation calculates gradients of loss with respect to weights. It propagates error backward through network layers."
+        },
+        {
+            "id": 6,
+            "type": "objective",
+            "text": "Which of the following is a reinforcement learning algorithm?",
+            "option_a": "Q-Learning",
+            "option_b": "Logistic Regression",
+            "option_c": "PCA",
+            "option_d": "Naive Bayes",
+            "correct_answer": "A"
+        },
+        {
+            "id": 7,
+            "type": "coding",
+            "text": "Write a Python function to implement bubble sort:",
+            "code_template": "def bubble_sort(arr):\n    # Your code here\n    pass",
+            "correct_answer": "def bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr"
+        },
+        {
+            "id": 8,
+            "type": "objective",
+            "text": "What is gradient descent?",
+            "option_a": "An optimization algorithm used to minimize a function",
+            "option_b": "A method for splitting data",
+            "option_c": "A loss function",
+            "option_d": "A type of neural network",
+            "correct_answer": "A"
+        },
+        {
+            "id": 9,
+            "type": "subjective",
+            "text": "Describe the difference between underfitting and overfitting with examples.",
+            "correct_answer": "Underfitting: Model too simple, fails to capture patterns. Overfitting: Model too complex, memorizes noise."
+        },
+        {
+            "id": 10,
+            "type": "objective",
+            "text": "What is 'dropout' used for in neural networks?",
+            "option_a": "To prevent overfitting",
+            "option_b": "To improve underfitting",
+            "option_c": "To increase accuracy",
+            "option_d": "To decrease bias",
+            "correct_answer": "A"
+        },
+        {
+            "id": 11,
+            "type": "coding",
+            "text": "Write a Python function to check if a string is a palindrome:",
+            "code_template": "def is_palindrome(s):\n    # Your code here\n    pass",
+            "correct_answer": "def is_palindrome(s):\n    s = s.lower().replace(' ', '')\n    return s == s[::-1]"
+        },
+        {
+            "id": 12,
+            "type": "objective",
+            "text": "What is a decision tree?",
+            "option_a": "A flowchart-like structure used for classification or regression",
+            "option_b": "A deep learning algorithm",
+            "option_c": "A clustering algorithm",
+            "option_d": "A type of neural network",
+            "correct_answer": "A"
+        }
+    ]
+}
+

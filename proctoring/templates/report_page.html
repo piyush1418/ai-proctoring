@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integrity Audit - {{ student.name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --fp-dark-green: #1a3c34;
+      --fp-accent-orange: #ff9f1c;
+      --fp-danger: #ef4444;
+      --fp-success: #10b981;
+      --fp-bg: #f8faf9;
+    }
+
+    body { 
+      background-color: var(--fp-bg); 
+      font-family: 'Inter', sans-serif; 
+      color: #334155;
+    }
+
+    .audit-header {
+      background-color: var(--fp-dark-green);
+      color: white;
+      padding: 40px 0;
+      border-radius: 0 0 40px 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .report-card { 
+      background: white; 
+      border: none;
+      border-radius: 20px; 
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .card-header-custom {
+      background-color: #f1f5f9;
+      padding: 15px 25px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fp-dark-green);
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .student-profile-img {
+      width: 130px; 
+      height: 130px; 
+      object-fit: cover; 
+      border-radius: 15px; 
+      border: 4px solid white;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .status-pill {
+      padding: 6px 20px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .status-flagged { background: #fee2e2; color: var(--fp-danger); }
+    .status-verified { background: #dcfce7; color: var(--fp-success); }
+
+    .evidence-img {
+      cursor: zoom-in;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .evidence-img:hover { transform: scale(1.03); }
+
+    .audio-tile {
+      background: #f8fafc;
+      border-radius: 15px;
+      padding: 15px;
+      border: 1px solid #e2e8f0;
+    }
+
+    audio::-webkit-media-controls-panel {
+      background-color: #f1f5f9;
+    }
+
+    .btn-download {
+      background-color: var(--fp-accent-orange);
+      border: none;
+      color: white;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 10px 25px;
+      transition: all 0.2s;
+    }
+
+    .btn-download:hover {
+      background-color: #e68a00;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 159, 28, 0.3);
+    }
+
+    .metric-box {
+      text-align: center;
+      padding: 20px;
+      border-right: 1px solid #eee;
+    }
+    .metric-box:last-child { border-right: none; }
+    .metric-val { font-size: 1.5rem; font-weight: 800; color: var(--fp-dark-green); }
+    .metric-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="audit-header">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div>
+        <h6 class="text-uppercase fw-bold mb-1" style="color: var(--fp-accent-orange); letter-spacing: 2px;">Integrity Report</h6>
+        <h2 class="fw-bold mb-0">Examination Forensic Audit</h2>
+      </div>
+      <a href="{% url 'download_report' student.id %}" class="btn btn-download">
+        Download PDF Report
+      </a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="report-card p-4 text-center">
+          <img src="{{ student.photo.url }}" alt="{{ student.name }}" class="student-profile-img mb-3">
+          <h4 class="fw-bold mb-1">{{ student.name }}</h4>
+          <p class="text-muted small mb-3">{{ student.email }}</p>
+          
+          <div class="mb-2">
+            {% if cheating_status %}
+              <span class="status-pill status-flagged">● INTEGRITY FLAGGED</span>
+            {% else %}
+              <span class="status-pill status-verified">● SESSION VERIFIED</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="card-header-custom">Performance Metrics</div>
+          <div class="d-flex flex-wrap">
+            <div class="col-6 metric-box">
+              <div class="metric-val">{{ correct_answers }}</div>
+              <div class="metric-label">Correct</div>
+            </div>
+            <div class="col-6 metric-box">
+              <div class="metric-val text-primary">{{ exam.percentage_score|default:"0" }}%</div>
+              <div class="metric-label">Score</div>
+            </div>
+            <div class="col-12 metric-box border-top">
+              <div class="metric-val {% if total_tab_switch_count > 0 %}text-danger{% endif %}">
+                {{ total_tab_switch_count }}
+              </div>
+              <div class="metric-label">Tab Switches</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="report-card">
+          <div class="card-header-custom">AI Vision Summary</div>
+          <div class="card-body">
+            <p class="mb-0">
+              {% if detected_objects != "No objects detected" %}
+                <span class="fw-bold text-danger">Suspicious Objects:</span> {{ detected_objects }}
+              {% else %}
+                <span class="text-success fw-bold">✓ Environment Clean:</span> No prohibited electronic devices or unauthorized persons detected.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="card-header-custom">Visual Evidence (Captured Frames)</div>
+          <div class="card-body">
+            <div class="row g-3">
+              {% if cheating_images %}
+                {% for img in cheating_images %}
+                  <div class="col-md-6 col-xl-4">
+                    <div class="border rounded-4 p-2 bg-light">
+                      <img src="{{ img.url }}" alt="Event Frame" class="evidence-img mb-2 shadow-sm">
+                      <div class="px-2 pb-1">
+                        <div class="small fw-bold text-uppercase" style="font-size: 0.65rem; color: #64748b;">{{ img.event_type }}</div>
+                        <div class="small text-muted" style="font-size: 0.7rem;">{{ img.timestamp }}</div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-center py-4">
+                  <p class="text-muted mb-0 italic">No visual violations recorded.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="report-card">
+          <div class="card-header-custom">Acoustic Analysis (Audio Logs)</div>
+          <div class="card-body">
+            {% if audio_urls %}
+              <div class="row g-3">
+                {% for audio in audio_urls %}
+                  <div class="col-md-6">
+                    <div class="audio-tile">
+                      <label class="small fw-bold text-muted mb-2 d-block">Recording Entry #{{ forloop.counter }}</label>
+                      <audio controls class="w-100">
+                        <source src="{{ audio }}" type="audio/wav">
+                      </audio>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted mb-0">No unauthorized acoustic signals detected.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center py-5 text-muted small">
+    &copy; 2026 FutureProctor AI Systems. Digital Audit ID: {{ student.id }}-SEC-AUDIT
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

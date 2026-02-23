@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureProctor | Admin Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <style>
+        :root {
+            --fp-dark-green: #1a3c34;
+            --fp-accent-orange: #ff9f1c;
+            --fp-bg-soft: #f4f7f6;
+            --fp-card-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            background-color: var(--fp-bg-soft);
+            font-family: 'Inter', sans-serif;
+            color: #334155;
+        }
+
+        /* Top Navigation */
+        .navbar {
+            background-color: var(--fp-dark-green) !important;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; }
+
+        /* Sidebar Sidebar */
+        .sidebar {
+            background: white;
+            min-height: calc(100vh - 72px);
+            padding: 2rem 1rem;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .nav-link {
+            color: #64748b;
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #f1f5f9;
+            color: var(--fp-dark-green);
+        }
+
+        /* Stat Cards */
+        .stat-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--fp-card-shadow);
+            border-bottom: 4px solid var(--fp-dark-green);
+        }
+
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--fp-dark-green); }
+        .stat-label { font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
+
+        /* Table Design */
+        .table-container {
+            background: white;
+            border-radius: 25px;
+            padding: 2rem;
+            box-shadow: var(--fp-card-shadow);
+            margin-top: 2rem;
+        }
+
+        .table thead th {
+            background-color: #f8fafc;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            border: none;
+            padding: 1.2rem;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            padding: 1.2rem;
+            border-color: #f1f5f9;
+        }
+
+        .trust-score-high { color: #10b981; font-weight: 700; }
+        .trust-score-low { color: #ef4444; font-weight: 700; }
+
+        /* Search Bar */
+        #searchBar {
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-add {
+            background-color: var(--fp-accent-orange);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem 1.5rem;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+        .btn-add:hover { background-color: #e68a00; color: white; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">FUTURE<span class="fw-light">PROCTOR</span></a>
+            <div class="d-flex ms-auto align-items-center">
+                <span class="text-white me-3 d-none d-md-inline small">Welcome, <strong>Admin</strong></span>
+                <a href="{% url 'home' %}" class="btn btn-sm btn-outline-light rounded-pill px-3">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 d-none d-md-block sidebar">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link active" href="#">📊 Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">🧑‍🎓 Students</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">📝 Exam Logs</a></li>
+                    <li class="nav-item mt-4">
+                        <a class="btn btn-add w-100" href="{% url 'add_question' %}">+ Add Question</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-10 py-4 px-md-5">
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Students</div>
+                            <div class="stat-value">{{ total_students|default:"12" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Exams Conducted</div>
+                            <div class="stat-value">{{ total_exams|default:"45" }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-label">Average Score</div>
+                            <div class="stat-value">{{ avg_score|default:"74.2" }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card" style="border-bottom-color: var(--fp-accent-orange);">
+                            <div class="stat-label">Integrity Issues</div>
+                            <div class="stat-value text-danger">{{ total_cheating_events|default:"8" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="table-container">
+                            <h6 class="fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">
+                                <i class="fas fa-chart-bar me-2"></i> Cheating Incidents Breakdown
+                            </h6>
+                            <canvas id="cheatingChart" style="max-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="table-container">
+                            <h6 class="fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">
+                                <i class="fas fa-graduation-cap me-2"></i> Score Distribution
+                            </h6>
+                            <canvas id="scoresChart" style="max-height: 250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-Risk & Top Performers -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="table-container">
+                            <h6 class="fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">
+                                <i class="fas fa-exclamation-triangle me-2 text-danger"></i> High-Risk Students
+                            </h6>
+                            {% if high_risk_students %}
+                                <div class="list-group">
+                                    {% for student in high_risk_students %}
+                                    <div class="list-group-item border-start border-danger ps-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">{{ student.name }}</h6>
+                                                <small class="text-muted">{{ student.email }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-danger" style="font-size: 0.85rem;">{{ student.trust_score }}%</span>
+                                                <div class="small text-muted mt-1">{{ student.cheating_events }} Issues</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-shield-alt mb-2 fs-3"></i>
+                                    <p class="small">All students have good integrity records</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="table-container">
+                            <h6 class="fw-bold mb-3" style="letter-spacing: 1px; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">
+                                <i class="fas fa-star me-2 text-success"></i> Perfect Score Students
+                            </h6>
+                            {% if perfect_score_students %}
+                                <div class="list-group">
+                                    {% for student in perfect_score_students %}
+                                    <div class="list-group-item border-start border-success ps-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 fw-bold">{{ student.name }}</h6>
+                                                <small class="text-muted">{{ student.exam_name }}</small>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success" style="font-size: 0.85rem;">100%</span>
+                                                <div class="small text-muted mt-1">{{ student.timestamp|date:"Y-m-d" }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-chart-pie mb-2 fs-3"></i>
+                                    <p class="small">No perfect scores yet</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">Complete Examinees List</h4>
+                        <div class="w-50">
+                            <input type="text" id="searchBar" placeholder="Search by name, email, or exam..." class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Examinee Details</th>
+                                    <th>Exams</th>
+                                    <th>Performance</th>
+                                    <th>Integrity</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ student.name }}</div>
+                                        <div class="small text-muted">{{ student.email }}</div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ student.exam_count }}</span>
+                                    </td>
+                                    <td>
+                                        {% if student.exams.first %}
+                                            <div class="fw-bold">{{ student.exams.first.percentage_score|default:"85" }}%</div>
+                                            <div class="progress" style="height: 4px; width: 60px;">
+                                                <div class="progress-bar bg-success" style="width: {{ student.exams.first.percentage_score|default:85 }}%"></div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small">No exams</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="{% if student.trust_score >= 80 %}trust-score-high{% else %}trust-score-low{% endif %}">
+                                            {{ student.trust_score }}%
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'report_page' student.id %}" class="btn btn-sm btn-outline-dark">
+                                            <i class="fas fa-file-alt me-1"></i> Report
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Cheating data from backend
+        const cheatingData = {{ cheating_breakdown_json|safe }};
+
+        // Cheating Incidents Chart
+        const cheatingCtx = document.getElementById('cheatingChart').getContext('2d');
+        new Chart(cheatingCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Tab Switches', 'Objects', 'Audio', 'Gaze', 'Multi-Person'],
+                datasets: [{
+                    label: 'Incident Count',
+                    data: [
+                        cheatingData.tab_switches || 0,
+                        cheatingData.object_detection || 0,
+                        cheatingData.audio_detection || 0,
+                        cheatingData.gaze_detected || 0,
+                        cheatingData.multiple_persons || 0
+                    ],
+                    borderColor: '#ff9f1c',
+                    backgroundColor: 'rgba(255, 159, 28, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#ff9f1c'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' }
+                },
+                scales: {
+                    r: { beginAtZero: true, grid: { color: '#f0f0f0' } }
+                }
+            }
+        });
+
+        // Score Distribution Chart
+        const scoresCtx = document.getElementById('scoresChart').getContext('2d');
+        new Chart(scoresCtx, {
+            type: 'bar',
+            data: {
+                labels: ['0-20%', '20-40%', '40-60%', '60-80%', '80-100%'],
+                datasets: [{
+                    label: 'Number of Students',
+                    data: [2, 3, 5, 8, 12],
+                    backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#3b82f6', '#10b981'],
+                    borderRadius: 8,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchBar').addEventListener('input', function () {
+            const searchText = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

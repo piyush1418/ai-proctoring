@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FuturProctor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --brand-green: #1a3c34; /* Matching the dark green in your image */
+            --soft-white: #fcfdfc;
+            --accent-green: #e9f5f2;
+        }
+
+        body {
+            background-color: var(--soft-white);
+            color: var(--brand-green);
+            font-family: 'Georgia', serif; /* Matching the serif font in your screenshot */
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            max-width: 1000px;
+            margin-top: 50px;
+        }
+
+        .main-title {
+            color: var(--brand-green);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .sub-text {
+            color: #666;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .exam-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* The decorative corners from your screenshot */
+        .exam-card::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-top: 2px solid #333;
+            border-right: 2px solid #333;
+        }
+
+        .icon-box {
+            background-color: var(--accent-green);
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--brand-green);
+            font-size: 1.5rem;
+        }
+
+        .rules-list {
+            text-align: left;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #444;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .rules-list li {
+            margin-bottom: 15px;
+            padding-left: 10px;
+        }
+
+        .rules-list strong {
+            color: var(--brand-green);
+        }
+
+        .btn-start {
+            background-color: var(--brand-green);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .btn-start:hover {
+            background-color: #0e241f;
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 15px rgba(26, 60, 52, 0.2);
+        }
+
+        footer {
+            margin-top: 50px;
+            padding-bottom: 30px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container dashboard-container text-center">
+        <h1 class="main-title">Welcome, Piyush!</h1>
+        <p class="sub-text">Comprehensive monitoring and intelligent assessment for secure examinations</p>
+
+        <div class="exam-card">
+            <div class="icon-box">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            
+            <h3 class="mb-4" style="color: var(--brand-green);">Exam Guidelines</h3>
+
+            <ul class="rules-list">
+                <li><strong>Device and Internet:</strong> Ensure your device is fully charged and connected to a high-speed internet connection.</li>
+                <li><strong>Webcam and Microphone:</strong> Mandatory for real-time monitoring; must remain on throughout the session.</li>
+                <li><strong>No Unauthorized Tabs:</strong> Opening other browser tabs or applications will trigger a security flag.</li>
+                <li><strong>Stay in Frame:</strong> Your face must be clearly visible to the AI proctor at all times.</li>
+                <li><strong>Quiet Environment:</strong> Background noise or movement by other people may lead to disqualification.</li>
+                <li><strong>Individual Effort:</strong> Any form of collaboration is strictly prohibited.</li>
+                <li><strong>Behavior Monitoring:</strong> AI systems will flag suspicious activities for human proctor review.</li>
+                <li><strong class="text-danger">Consequences:</strong> Violations may lead to immediate termination of your exam.</li>
+            </ul>
+
+            <button id="start-exam-btn" class="btn btn-start">
+                START EXAMINATION
+            </button>
+        </div>
+
+        <footer>
+            &copy; 2026 FuturProctor. Secure Examination Environment.
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('start-exam-btn').addEventListener('click', function () {
+            // Updated link logic
+            window.location.href = '/exam'; 
+        });
+    </script>
+</body>
+</html>
