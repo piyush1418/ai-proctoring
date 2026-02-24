@@ -24,9 +24,6 @@ The **AI-Based Online Exam Proctoring System** is a cutting-edge proctoring solu
 - **Deployment**: Hosted on a cloud platform with scalability in mind
 
 
-### 📽️ Demo Video
-
-Watch the demo here: [https://youtu.be/O8kfFmwkfOU](https://youtu.be/O8kfFmwkfOU)
 
 
 ## Installation & Setup
@@ -90,6 +87,6 @@ This project is licensed under the MIT License.
 
 ## Contact
 For any inquiries or contributions, feel free to reach out to:
-- **Email**: rammey115@gmail.com
-- **Phone**: 9819936338
+- **Email**: piyushraj100101@gmail.com
+- **Phone**: 
 
